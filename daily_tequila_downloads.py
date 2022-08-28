@@ -24,12 +24,16 @@ else:
 
 CHAT_ID = -1001791062372
 
+BRANCH = "tobacco"
+
 date = str(datetime.now().replace(second=0, microsecond=0))
 
 message = "Download stats as of " + date + " in last 24 hours:\n"
 
 totalDownloads = 0
 totalPrevious = 0
+
+diff = 0
 
 skippeddevices = []
 
@@ -67,6 +71,9 @@ for oem in response:
                 continue
 
             for asset in release["assets"]:
+                if BRANCH not in asset["name"]:
+                    continue
+
                 print("  adding " + str(asset["download_count"]))
                 deviceDownloads += asset["download_count"]
 
