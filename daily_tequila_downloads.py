@@ -77,7 +77,9 @@ for oem in response:
 
         diff = downloads[device] - previous
 
-        message += "\n" + device + ": " + str(deviceDownloads) + " (+" + str(diff) + ")"
+        message += "\n" + device + ": " + str(deviceDownloads)
+        if diff != 0:
+            message += " (+" + str(diff) + ")"
 
 totalDiff = totalDownloads - totalPrevious
 
@@ -93,8 +95,11 @@ if (len(skippeddevices) > 0):
     message += "\n"
     message += "\n"
 
-message += "Total: " + str(totalDownloads) + " (+" + str(totalDiff) + ")"
+message += "Total: " + str(totalDownloads)
+if diff != 0:
+    message += " (+" + str(totalDiff) + ")"
 
+print(message)
 # Send telegram message with results
 bot = telegram.Bot(token=BOT_TOKEN)
 bot.send_message(text=message, chat_id=CHAT_ID)
