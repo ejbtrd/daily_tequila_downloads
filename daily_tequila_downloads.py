@@ -39,7 +39,7 @@ skippeddevices = []
 
 downloads = json.load(open("downloads.json", "r"))
 
-devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/sombrero/devices.json"
+devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/" + BRANCH + "/devices.json"
 
 response = requests.get(devices_url).json()
 
