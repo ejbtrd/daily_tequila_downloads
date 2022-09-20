@@ -7,6 +7,7 @@
 
 from pathlib import Path
 from datetime import datetime
+import asyncio
 import json
 import requests
 import sys
@@ -28,11 +29,6 @@ BRANCH = "tobacco"
 
 date = str(datetime.now().replace(second=0, microsecond=0))
 
-message = "Download stats as of " + date + " in last 24 hours:\n"
-
-totalDownloads = 0
-totalPrevious = 0
-
 diff = 0
 
 skippeddevices = []
@@ -43,74 +39,85 @@ devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/" + BRANC
 
 response = requests.get(devices_url).json()
 
-for oem in response:
-    for device in response[oem]:
-        deviceDownloads = 0
+async def main():
+    message = "Download stats as of " + date + " in last 24 hours:\n"
 
-        oem = oem.lower()
+    totalDownloads = 0
+    totalPrevious = 0
 
-        print("Processing " + oem + "/" + device + "...")
-        url = "https://api.github.com/repos/tequilaOS/platform_device_" + oem + "_" + device + "/releases"
+    for oem in response:
+        for device in response[oem]:
+            deviceDownloads = 0
 
-        deviceresponse = requests.get(url)
+            oem = oem.lower()
 
-        if deviceresponse.status_code != 200:
-            skippeddevices.append(device)
-            continue
+            print("Processing " + oem + "/" + device + "...")
+            url = "https://api.github.com/repos/tequilaOS/platform_device_" + oem + "_" + device + "/releases"
 
-        try:
-            previous = downloads[device]
-        except KeyError:
-            downloads[device] = 0
+            deviceresponse = requests.get(url)
 
-        previous = downloads[device]
-
-        for release in deviceresponse.json():
-            if release["prerelease"]:
-                # Skip release if prerelease is "true" (experimental build)
+            if deviceresponse.status_code != 200:
+                skippeddevices.append(device)
                 continue
 
-            for asset in release["assets"]:
-                if BRANCH not in asset["name"]:
+            try:
+                previous = downloads[device]
+            except KeyError:
+                downloads[device] = 0
+
+            previous = downloads[device]
+
+            for release in deviceresponse.json():
+                if release["prerelease"]:
+                    # Skip release if prerelease is "true" (experimental build)
                     continue
 
-                print("  adding " + str(asset["download_count"]))
-                deviceDownloads += asset["download_count"]
+                for asset in release["assets"]:
+                    if BRANCH not in asset["name"]:
+                        continue
 
-        downloads[device] = deviceDownloads
+                    print("  adding " + str(asset["download_count"]))
+                    deviceDownloads += asset["download_count"]
 
-        totalDownloads += downloads[device]
-        totalPrevious += previous
+            downloads[device] = deviceDownloads
 
-        diff = downloads[device] - previous
+            totalDownloads += downloads[device]
+            totalPrevious += previous
 
-        message += "\n" + device + ": " + str(deviceDownloads)
-        if diff != 0:
-            message += " (+" + str(diff) + ")"
+            diff = downloads[device] - previous
 
-totalDiff = totalDownloads - totalPrevious
+            message += "\n" + device + ": " + str(deviceDownloads)
+            if diff != 0:
+                message += " (+" + str(diff) + ")"
 
-message += "\n"
-message += "\n"
-
-if (len(skippeddevices) > 0):
-    message += "Skipped devices:"
-
-    for device in skippeddevices:
-        message += "\n" + device
+    totalDiff = totalDownloads - totalPrevious
 
     message += "\n"
     message += "\n"
 
-message += "Total: " + str(totalDownloads)
-if diff != 0:
-    message += " (+" + str(totalDiff) + ")"
+    if (len(skippeddevices) > 0):
+        message += "Skipped devices:"
 
-print(message)
-# Send telegram message with results
-bot = telegram.Bot(token=BOT_TOKEN)
-bot.send_message(text=message, chat_id=CHAT_ID)
+        for device in skippeddevices:
+            message += "\n" + device
 
-# Write to JSON
-with open("downloads.json", "w") as f:
-    f.write(json.dumps(downloads, indent=4))
+        message += "\n"
+        message += "\n"
+
+    message += "Total: " + str(totalDownloads)
+    if diff != 0:
+        message += " (+" + str(totalDiff) + ")"
+
+    print(message)
+
+    # Send telegram message with results
+    bot = telegram.Bot(BOT_TOKEN)
+    async with bot:
+        await bot.send_message(text=message, chat_id=CHAT_ID)
+
+    # Write to JSON
+    with open("downloads.json", "w") as f:
+        f.write(json.dumps(downloads, indent=4))
+
+if __name__ == '__main__':
+    asyncio.run(main())
