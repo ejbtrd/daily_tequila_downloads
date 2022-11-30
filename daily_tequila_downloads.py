@@ -86,6 +86,8 @@ async def main():
 
             diff = downloads[device] - previous
 
+            downloads[device + "_diff"] = diff
+
             message += "\n" + device + ": " + str(deviceDownloads)
             if diff != 0:
                 message += " (+" + str(diff) + ")"
@@ -117,7 +119,7 @@ async def main():
 
     # Write to JSON
     with open("downloads.json", "w") as f:
-        f.write(json.dumps(downloads, indent=4))
+        f.write(json.dumps(downloads, indent=4, sort_keys=True))
 
 if __name__ == '__main__':
     asyncio.run(main())
