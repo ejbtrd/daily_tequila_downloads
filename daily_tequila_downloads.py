@@ -116,6 +116,8 @@ async def main():
     bot = telegram.Bot(BOT_TOKEN)
     async with bot:
         await bot.send_message(text=message, chat_id=CHAT_ID)
+    
+    downloads["_date"] = date
 
     # Write to JSON
     with open("downloads.json", "w") as f:
