@@ -1,10 +1,19 @@
 {
-    "renoir": 387,
-    "umi": 1510,
-    "jasmine_sprout": 1516,
-    "wayne": 969,
-    "lemonadep": 426,
-    "surya": 374,
-    "alioth": 112,
-    "enchilada": 47
+    "_date": "2022-12-01 21:13:00",
+    "alioth": 113,
+    "alioth_diff": 1,
+    "enchilada": 51,
+    "enchilada_diff": 4,
+    "jasmine_sprout": 1532,
+    "jasmine_sprout_diff": 16,
+    "lemonadep": 436,
+    "lemonadep_diff": 10,
+    "renoir": 391,
+    "renoir_diff": 4,
+    "surya": 408,
+    "surya_diff": 34,
+    "umi": 1534,
+    "umi_diff": 24,
+    "wayne": 979,
+    "wayne_diff": 10
 }
