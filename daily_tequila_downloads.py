@@ -68,10 +68,6 @@ async def main():
             previous = downloads[device]
 
             for release in deviceresponse.json():
-                if release["prerelease"]:
-                    # Skip release if prerelease is "true" (experimental build)
-                    continue
-
                 for asset in release["assets"]:
                     if BRANCH not in asset["name"]:
                         continue
