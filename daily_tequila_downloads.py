@@ -57,6 +57,7 @@ async def main():
             deviceresponse = requests.get(url)
 
             if deviceresponse.status_code != 200:
+                print("Failed to get data for " + device + ": " + deviceresponse.status_code)
                 skippeddevices.append(device)
                 continue
 
