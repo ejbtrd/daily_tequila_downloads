@@ -19,7 +19,8 @@ if len(sys.argv) > 1:
     BOT_TOKEN = sys.argv[1]
 else:
     try:
-        BOT_TOKEN = str(open(home + "/.config/tequilabottoken", "r").read().strip())
+        BOT_TOKEN = str(
+            open(home + "/.config/tequilabottoken", "r").read().strip())
     except FileNotFoundError:
         sys.exit("github token not found")
 
@@ -40,10 +41,10 @@ try:
 except FileNotFoundError:
     GH_AUTH = False
 
-
 devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/main/devices.json"
 
 response = requests.get(devices_url).json()
+
 
 async def main():
     message = "Download stats as of " + date + " in last 24 hours:\n"
@@ -58,7 +59,8 @@ async def main():
             oem = oem.lower()
 
             print("Processing " + oem + "/" + device + "...")
-            url = "https://api.github.com/repos/tequilaOS/platform_device_" + oem + "_" + device + "/releases"
+            url = "https://api.github.com/repos/tequilaOS/platform_device_" + \
+                oem + "_" + device + "/releases"
 
             if GH_AUTH:
                 deviceresponse = requests.get(url, headers=headers)
@@ -66,7 +68,8 @@ async def main():
                 deviceresponse = requests.get(url)
 
             if deviceresponse.status_code != 200:
-                print("Failed to get data for " + device + ": " + str(deviceresponse.status_code))
+                print("Failed to get data for " + device +
+                      ": " + str(deviceresponse.status_code))
                 skippeddevices.append(device)
                 continue
 
@@ -119,7 +122,7 @@ async def main():
     bot = telegram.Bot(BOT_TOKEN)
     async with bot:
         await bot.send_message(text=message, chat_id=CHAT_ID)
-    
+
     downloads["_date"] = date
 
     # Write to JSON
