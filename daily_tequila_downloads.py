@@ -110,7 +110,7 @@ async def main():
         message += "\n"
 
     message += "Total: " + str(totalDownloads)
-    if diff != 0:
+    if totalDiff != 0:
         message += " (+" + str(totalDiff) + ")"
 
     print(message)
