@@ -25,8 +25,6 @@ else:
 
 CHAT_ID = -1001791062372
 
-BRANCH = "tobacco"
-
 date = str(datetime.now().replace(second=0, microsecond=0))
 
 diff = 0
@@ -35,7 +33,7 @@ skippeddevices = []
 
 downloads = json.load(open("downloads.json", "r"))
 
-devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/" + BRANCH + "/devices.json"
+devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/main/devices.json"
 
 response = requests.get(devices_url).json()
 
@@ -70,9 +68,6 @@ async def main():
 
             for release in deviceresponse.json():
                 for asset in release["assets"]:
-                    if BRANCH not in asset["name"]:
-                        continue
-
                     print("  adding " + str(asset["download_count"]))
                     deviceDownloads += asset["download_count"]
 
