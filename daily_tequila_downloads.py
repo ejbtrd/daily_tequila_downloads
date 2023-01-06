@@ -33,6 +33,14 @@ skippeddevices = []
 
 downloads = json.load(open("downloads.json", "r"))
 
+try:
+    GITHUB_TOKEN = str(open(home + "/.githubtoken", "r").read().strip())
+    headers = {"Authorization": "Bearer " + GITHUB_TOKEN}
+    GH_AUTH = True
+except FileNotFoundError:
+    GH_AUTH = False
+
+
 devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/main/devices.json"
 
 response = requests.get(devices_url).json()
@@ -52,7 +60,10 @@ async def main():
             print("Processing " + oem + "/" + device + "...")
             url = "https://api.github.com/repos/tequilaOS/platform_device_" + oem + "_" + device + "/releases"
 
-            deviceresponse = requests.get(url)
+            if GH_AUTH:
+                deviceresponse = requests.get(url, headers=headers)
+            else:
+                deviceresponse = requests.get(url)
 
             if deviceresponse.status_code != 200:
                 print("Failed to get data for " + device + ": " + str(deviceresponse.status_code))
