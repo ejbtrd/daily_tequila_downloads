@@ -20,7 +20,7 @@ if len(sys.argv) > 1:
 else:
     try:
         BOT_TOKEN = str(
-            open(home + "/.config/tequilabottoken", "r").read().strip())
+            open(f"{home}/.config/tequilabottoken", "r").read().strip())
     except FileNotFoundError:
         sys.exit("github token not found")
 
@@ -35,7 +35,7 @@ skippeddevices = []
 downloads = json.load(open("downloads.json", "r"))
 
 try:
-    GITHUB_TOKEN = str(open(home + "/.githubtoken", "r").read().strip())
+    GITHUB_TOKEN = str(open(f"{home}/.githubtoken", "r").read().strip())
     headers = {"Authorization": "Bearer " + GITHUB_TOKEN}
     GH_AUTH = True
 except FileNotFoundError:
@@ -47,7 +47,7 @@ response = requests.get(devices_url).json()
 
 
 async def main():
-    message = "Download stats as of " + date + " in last 24 hours:\n"
+    message = f"Download stats as of {date} in last 24 hours:\n"
 
     totalDownloads = 0
     totalPrevious = 0
@@ -58,9 +58,8 @@ async def main():
 
             oem = oem.lower()
 
-            print("Processing " + oem + "/" + device + "...")
-            url = "https://api.github.com/repos/tequilaOS/platform_device_" + \
-                oem + "_" + device + "/releases"
+            print(f"Processing {oem}/{device}...")
+            url = f"https://api.github.com/repos/tequilaOS/platform_device_{oem}_{device}/releases"
 
             if GH_AUTH:
                 deviceresponse = requests.get(url, headers=headers)
@@ -84,7 +83,7 @@ async def main():
 
             for release in deviceresponse.json():
                 for asset in release["assets"]:
-                    print("  adding " + str(asset["download_count"]))
+                    print(f"  adding {asset['download_count']}")
                     deviceDownloads += asset["download_count"]
 
             downloads[device] = deviceDownloads
@@ -96,9 +95,9 @@ async def main():
 
             downloads[device + "_diff"] = diff
 
-            message += "\n" + device + ": " + str(deviceDownloads)
+            message += f"\n {device}: {deviceDownloads}"
             if diff != 0:
-                message += " (+" + str(diff) + ")"
+                message += f" (+ {diff})"
 
     totalDiff = totalDownloads - totalPrevious
 
@@ -109,14 +108,14 @@ async def main():
         message += "Skipped devices:"
 
         for device in skippeddevices:
-            message += "\n" + device
+            message += f"\n{device}"
 
         message += "\n"
         message += "\n"
 
-    message += "Total: " + str(totalDownloads)
+    message += f"Total: {totalDownloads}"
     if totalDiff != 0:
-        message += " (+" + str(totalDiff) + ")"
+        message += f" (+{totalDiff})"
 
     print(message)
 
