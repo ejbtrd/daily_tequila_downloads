@@ -81,6 +81,10 @@ async def main():
 
             previous = downloads[device]
 
+            if len(deviceresponse.json()) == 0:
+                skippeddevices.append(device)
+                continue
+
             for release in deviceresponse.json():
                 for asset in release["assets"]:
                     print(f"  adding {asset['download_count']}")
@@ -95,9 +99,9 @@ async def main():
 
             downloads[device + "_diff"] = diff
 
-            message += f"\n {device}: {deviceDownloads}"
+            message += f"\n{device}: {deviceDownloads}"
             if diff != 0:
-                message += f" (+ {diff})"
+                message += f" (+{diff})"
 
     totalDiff = totalDownloads - totalPrevious
 
