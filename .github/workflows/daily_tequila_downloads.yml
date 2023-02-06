@@ -4,8 +4,6 @@ env:
   TZ: Europe/Warsaw
 
 on:
-  push:
-    branches: [ main ]
   schedule:
   - cron: "0 20 * * *"
 
