@@ -130,6 +130,9 @@ async def main():
 
     downloads["_date"] = date
 
+    downloads["_total"] = totalDownloads
+    downloads["_total_diff"] = totalDiff
+
     # Write to JSON
     with open("downloads.json", "w") as f:
         f.write(json.dumps(downloads, indent=4, sort_keys=True))
