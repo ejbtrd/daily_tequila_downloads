@@ -89,7 +89,7 @@ async def main():
 
             message += f"\n{device}: {deviceDownloads}"
             if diff != 0:
-                message += f" (+{diff})"
+                message += f" (+{diff})" if diff > 0 else f" ({diff})"
 
     totalDiff = totalDownloads - totalPrevious
 
@@ -107,7 +107,7 @@ async def main():
 
     message += f"Total: {totalDownloads}"
     if totalDiff != 0:
-        message += f" (+{totalDiff})"
+        message += f" (+{totalDiff})" if totalDiff > 0 else f" ({totalDiff})"
 
     print(message)
 
