@@ -40,11 +40,11 @@ async def main():
             try:
                 if response[oem][device]["discontinued"]:
                     print(f"{device} is discontinued - skipping")
-                    skippeddevices.append(device)
+                    skippeddevices.append(f"{device} - discontinued")
                     continue
             except KeyError:
                 pass
-    
+
             deviceDownloads = 0
 
             oem = oem.lower()
@@ -70,7 +70,7 @@ async def main():
                 previous = downloads[device]
 
             if len(deviceresponse.json()) == 0:
-                skippeddevices.append(device)
+                skippeddevices.append(f"{device} - no releases")
                 continue
 
             for release in deviceresponse.json():
