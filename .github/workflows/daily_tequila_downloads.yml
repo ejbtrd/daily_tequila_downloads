@@ -8,10 +8,9 @@ on:
   - cron: "0 20 * * *"
 
 jobs:
-  build:  
+  count:
+    name: "Count downloads"
     runs-on: ubuntu-latest
-
-    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
 
     steps:
     - name: Get current date
@@ -38,9 +37,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Count downloads
       env:
-        BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
       run: |
-        python ./daily_tequila_downloads.py "$BOT_TOKEN"
+        python ./daily_tequila_downloads.py
 
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
