@@ -1,56 +1,39 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 # Downloads counter for tequilaOS
 #
 # Counts downloads for each device and sends
 # them in telegram message every day
 
-from pathlib import Path
 from datetime import datetime
+from dotenv import load_dotenv
+
 import asyncio
 import json
+import os
 import requests
-import sys
 import telegram
-
-home = str(Path.home())
-
-if len(sys.argv) > 1:
-    BOT_TOKEN = sys.argv[1]
-else:
-    try:
-        BOT_TOKEN = str(
-            open(f"{home}/.config/tequilabottoken", "r").read().strip())
-    except FileNotFoundError:
-        sys.exit("github token not found")
-
-CHAT_ID = -1001791062372
-
-date = str(datetime.now().replace(second=0, microsecond=0))
-
-diff = 0
-
-skippeddevices = []
-
-downloads = json.load(open("downloads.json", "r"))
-
-try:
-    GITHUB_TOKEN = str(open(f"{home}/.githubtoken", "r").read().strip())
-    headers = {"Authorization": "Bearer " + GITHUB_TOKEN}
-    GH_AUTH = True
-except FileNotFoundError:
-    GH_AUTH = False
-
-devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/main/devices.json"
-
-response = requests.get(devices_url).json()
 
 
 async def main():
-    message = f"Download stats as of {date} in last 24 hours:\n"
+    load_dotenv("config.env")
 
-    totalDownloads = 0
-    totalPrevious = 0
+    TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN")
+    CHAT_ID = -1001791062372
+
+    date = str(datetime.now().replace(second=0, microsecond=0))
+
+    totalDownloads = totalPrevious = diff = 0
+
+    skippeddevices = []
+
+    downloads = json.load(open("downloads.json", "r"))
+
+    devices_url = "https://raw.githubusercontent.com/tequilaOS/tequila_ota/main/devices.json"
+
+    response = requests.get(devices_url).json()
+
+    message = f"Download stats as of {date} in last 24 hours:\n"
 
     for oem in response:
         for device in response[oem]:
@@ -59,12 +42,9 @@ async def main():
             oem = oem.lower()
 
             print(f"Processing {oem}/{device}...")
-            url = f"https://api.github.com/repos/tequilaOS/platform_device_{oem}_{device}/releases"
 
-            if GH_AUTH:
-                deviceresponse = requests.get(url, headers=headers)
-            else:
-                deviceresponse = requests.get(url)
+            url = f"https://api.github.com/repos/tequilaOS/platform_device_{oem}_{device}/releases"
+            deviceresponse = requests.get(url)
 
             if deviceresponse.status_code != 200:
                 print(
@@ -78,8 +58,8 @@ async def main():
                 previous = downloads[device]
             except KeyError:
                 downloads[device] = 0
-
-            previous = downloads[device]
+            finally:
+                previous = downloads[device]
 
             if len(deviceresponse.json()) == 0:
                 skippeddevices.append(device)
@@ -124,7 +104,7 @@ async def main():
     print(message)
 
     # Send telegram message with results
-    bot = telegram.Bot(BOT_TOKEN)
+    bot = telegram.Bot(TG_BOT_TOKEN)
     async with bot:
         await bot.send_message(text=message, chat_id=CHAT_ID)
 
