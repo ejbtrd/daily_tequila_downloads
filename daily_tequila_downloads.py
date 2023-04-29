@@ -74,6 +74,10 @@ async def main():
                 continue
 
             for release in deviceresponse.json():
+                if release["prerelease"]:
+                    # Skip release if prerelease is "true" (experimental build)
+                    continue
+
                 for asset in release["assets"]:
                     print(f"  adding {asset['download_count']}")
                     deviceDownloads += asset["download_count"]
