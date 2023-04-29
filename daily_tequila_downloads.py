@@ -71,6 +71,9 @@ async def main():
                     continue
 
                 for asset in release["assets"]:
+                    if not asset["name"].startswith("tequila-"):
+                        continue
+
                     print(f"  adding {asset['download_count']}")
                     deviceDownloads += asset["download_count"]
 
