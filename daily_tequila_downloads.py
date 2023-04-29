@@ -37,14 +37,6 @@ async def main():
 
     for oem in response:
         for device in response[oem]:
-            try:
-                if response[oem][device]["discontinued"]:
-                    print(f"{device} is discontinued - skipping")
-                    skippeddevices.append(f"{device} - discontinued")
-                    continue
-            except KeyError:
-                pass
-
             deviceDownloads = 0
 
             oem = oem.lower()
